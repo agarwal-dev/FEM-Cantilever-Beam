@@ -1,0 +1,6 @@
+First 5 Natural Frequencies (Hz):
+Mode 1: 0.394 Hz
+Mode 2: 2.464 Hz
+Mode 3: 6.886 Hz
+Mode 4: 13.463 Hz
+Mode 5: 22.190 Hz
