@@ -1,88 +1,66 @@
-# 2D Finite Element Analysis of a Cantilever Beam (Q4 Quad Elements)
+# 2D FEM Cantilever Beam Analysis
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)
-![SciPy](https://img.shields.io/badge/SciPy-Sparse%20Solvers-green.svg)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-Visualization-orange.svg)
-![License](https://img.shields.io/badge/License-MIT-brightgreen.svg)
+Structural analysis and dynamic simulation of a 2D continuum cantilever beam using Q4 quadrilateral finite elements, developed as a B.Tech FEM project.
 
-An end-to-end, high-performance **2D Finite Element Method (FEM) Solver** written in Python using 4-node bilinear quadrilateral (Q4) elements and $2 \times 2$ Gaussian Quadrature integration. 
+## Project Overview
 
-This repository provides full static deflection analysis, stress/strain field visualization, transverse shear stress evaluation across thick/thin beam limits, parametric aspect-ratio studies, dynamic modal analysis (natural frequencies & mode shapes), and benchmark validation against **Euler-Bernoulli Beam Theory**, **Timoshenko Beam Theory**, and **ANSYS Commercial Simulation**.
+The project implements a custom 2D Finite Element Method (FEM) solver in Python using 4-node bilinear quadrilateral (Q4) isoparametric elements with $2 \times 2$ Gauss Quadrature numerical integration under plane stress conditions.
 
----
+The solver performs static deflection analysis, stress/strain field visualization, transverse shear evaluation, aspect-ratio parametric studies, dynamic modal analysis, and analytical theory validation.
 
-## 📑 Table of Contents
-- [Overview & Methodology](#-overview--methodology)
-- [Mathematical Formulation](#-mathematical-formulation)
-- [Repository Structure](#-repository-structure)
-- [Installation & Quick Start](#-installation--quick-start)
-- [Features & Workflow](#-features--workflow)
-- [Results & Visualizations](#-results--visualizations)
-  - [1. Static Deflection & Energy Convergence](#1-static-deflection--energy-convergence)
-  - [2. Stress & Strain Contours](#2-stress--strain-contours)
-  - [3. Transverse Shear Stress Distribution](#3-transverse-shear-stress-distribution)
-  - [4. Parametric Study (Aspect Ratio L/H)](#4-parametric-study-aspect-ratio-lh)
-  - [5. Modal Dynamic Analysis](#5-modal-dynamic-analysis)
-- [Validation & Benchmarks](#-validation--benchmarks)
-- [ANSYS Verification Guide](#-ansys-verification-guide)
-- [License](#-license)
+## Key Features
 
----
+- 4-node bilinear isoparametric quadrilateral (Q4) elements
+- $2 \times 2$ Gaussian Quadrature numerical integration
+- Sparse matrix assembly (`scipy.sparse`) for high efficiency
+- Static deflection and total strain energy calculation
+- Bending stress ($\sigma_{xx}$) and strain ($\epsilon_{xx}$) contour field visualization
+- Transverse shear stress profile extraction across beam thickness
+- Parametric aspect ratio investigation ($L/H = 2$ to $50$)
+- Dynamic modal analysis (first 5 natural frequencies & mode shapes)
+- Benchmark validation against Euler-Bernoulli and Timoshenko beam theories
 
-## 📌 Overview & Methodology
+## Design & Calculations
 
-The custom Python solver models a 2D continuum cantilever beam subjected to a uniformly distributed transverse load $q$ along its top edge ($y = H$), with fixed boundary conditions at $x = 0$.
+- Element type: **Q4 Isoparametric Quadrilateral**
+- Integration points: **$2 \times 2$ Gauss Quadrature** ($\xi, \eta = \pm 1/\sqrt{3}$)
+- Young's Modulus ($E$): **210 GPa** (Steel)
+- Poisson's Ratio ($\nu$): **0.3**
+- Density ($\rho$): **7850 kg/m³**
+- Applied load ($q$): **-10 kN/m** (Uniform transverse load)
+- Slender beam dimensions: **$L = 50\text{ m}$, $H = 1\text{ m}$, $t = 0.1\text{ m}$** (Aspect Ratio = 50)
+- Deep beam dimensions: **$L = 5\text{ m}$, $H = 1\text{ m}$, $t = 0.1\text{ m}$** (Aspect Ratio = 5)
+- Calculated tip deflection: **4.430 m** (Custom FEM) vs **4.464 m** (Euler-Bernoulli Analytical)
 
-Key simulation characteristics:
-* **Element Type**: 4-Node Bilinear Quadrilateral (Q4) isoparametric elements.
-* **Integration Scheme**: Full $2 \times 2$ Gauss Quadrature ($\xi, \eta = \pm 1/\sqrt{3}$).
-* **Material Model**: Linear Isotropic Elasticity under Plane Stress formulation.
-* **Sparse Matrix Solvers**: Efficient assembly using COO sparse representation and direct linear solve via `scipy.sparse.linalg.spsolve`.
-* **Dynamic Eigenvalue Solver**: Generalized sparse eigenvalue solver (`scipy.sparse.linalg.eigsh`) for undamped free-vibration modal analysis.
+## Simulation & Code Structure
 
----
+The code is organized into modular scripts as well as a monolithic submission script:
 
-## 📐 Mathematical Formulation
+- `submission_code.py` — Monolithic script executing all simulation modules
+- `main.py` — Interactive CLI solver for custom geometry, materials, and mesh
+- `fem_solver.py` — Core OOP classes (`Material`, `Mesh`, `FEMSolver`)
+- `analytical_solutions.py` — Euler-Bernoulli & Timoshenko closed-form solutions
+- `report.md` — Detailed academic project report
 
-### 1. Q4 Isoparametric Shape Functions
-For natural coordinates $\xi, \eta \in [-1, 1]$:
-$$N_i(\xi, \eta) = \frac{1}{4}(1 + \xi_i \xi)(1 + \eta_i \eta), \quad i = 1, 2, 3, 4$$
+## Tools Used
 
-### 2. Element Stiffness & Mass Matrices
-$$\mathbf{K}_e = \int_{-1}^{1} \int_{-1}^{1} \mathbf{B}^T \mathbf{D} \mathbf{B} \cdot t \cdot \det(\mathbf{J}) \, d\xi \, d\eta$$
+- Python 3.x
+- NumPy (Matrix operations)
+- SciPy (Sparse solvers & eigenvalue analysis)
+- Matplotlib (Contour plotting & visualization)
+- SolidWorks & ANSYS (CAD modeling & commercial benchmarking)
 
-$$\mathbf{M}_e = \rho \int_{-1}^{1} \int_{-1}^{1} \mathbf{N}^T \mathbf{N} \cdot t \cdot \det(\mathbf{J}) \, d\xi \, d\eta$$
+## Applications
 
-where $\mathbf{B}$ is the strain-displacement matrix, $\mathbf{D}$ is the plane stress constitutive matrix, $\mathbf{J}$ is the Jacobian matrix, $t$ is beam thickness, and $\rho$ is material density.
+- Structural beam analysis in civil and mechanical engineering
+- Validation of 2D continuum elements against 1D beam theories
+- Educational FEM implementation and mesh convergence studies
+- Dynamic free-vibration mode shape visualization
 
-### 3. Constitutive Relations (Plane Stress)
-$$\mathbf{D} = \frac{E}{1-\nu^2} \begin{bmatrix} 1 & \nu & 0 \\ \nu & 1 & 0 \\ 0 & 0 & \frac{1-\nu}{2} \end{bmatrix}$$
+## Preview
 
----
+Result plots, convergence graphs, stress/strain contours, and mode shapes are included in this repository under the `plots/` directory.
 
-## 📁 Repository Structure
+## Project Status
 
-```text
-├── README.md                      # Project documentation and user guide
-├── report.md                      # Comprehensive academic technical report
-├── submission_code.py             # Single monolithic script (All-in-one runner)
-├── main.py                        # Interactive CLI solver for custom inputs
-├── fem_solver.py                  # Core OOP modules: Material, Mesh, FEMSolver
-├── analytical_solutions.py        # Analytical Euler-Bernoulli & Timoshenko functions
-├── run_validation.py              # Convergence & deflection validation script
-├── run_shear.py                   # Transverse shear stress investigation script
-├── run_parametric.py             # Aspect ratio parametric study script
-├── run_modal.py                   # Dynamic modal analysis script
-├── Test bar.IGS                   # CAD Model (IGES format for ANSYS import)
-├── Test bar.SLDPRT                # SolidWorks Part CAD Model
-└── plots/                         # High-resolution output graphics & data
-    ├── disp_at_A_convergence.png
-    ├── energy_convergence.png
-    ├── displacement_contour.png
-    ├── stress_contour.png
-    ├── strain_contour.png
-    ├── shear_stress_vs_thickness.png
-    ├── disp_at_A_vs_aspect_ratio.png
-    ├── mode_shapes.png
-    ├── modal_convergence.png
-    └── frequencies.txt
+**Completed**
