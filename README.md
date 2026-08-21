@@ -59,7 +59,7 @@ The code is organized into modular scripts as well as a monolithic submission sc
 
 ## Preview
 
-Result plots, convergence graphs, stress/strain contours, and mode shapes are included in this repository under the `plots/` directory.
+Result plots, convergence graphs, stress/strain contours, and mode shapes are included in this repository under the `plots` directory.
 
 ## Project Status
 
